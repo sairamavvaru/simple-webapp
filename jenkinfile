@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Pull') {
       steps {
-        git 'https://github.com/YOUR_USERNAME/simple-webapp.git'
+        git 'https://github.com/sairamavvaru/simple-webapp.git'
       }
     }
 
