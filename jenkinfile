@@ -1,0 +1,35 @@
+pipeline {
+  agent any
+
+  environment {
+    EC2_USER = 'ec2-user'
+    EC2_IP = 'YOUR_EC2_PUBLIC_IP'
+    TARGET_PATH = '/usr/share/nginx/html/index.html'
+  }
+
+  stages {
+    stage('Pull') {
+      steps {
+        git 'https://github.com/YOUR_USERNAME/simple-webapp.git'
+      }
+    }
+
+    stage('Build & Test') {
+      steps {
+        echo "✅ Running basic tests..."
+        sh 'test -f index.html || { echo "❌ index.html missing!"; exit 1; }'
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sshagent (credentials: ['web-server-key']) {
+          sh """
+            echo '🚀 Deploying to EC2...'
+            scp -o StrictHostKeyChecking=no index.html ${EC2_USER}@${EC2_IP}:${TARGET_PATH}
+          """
+        }
+      }
+    }
+  }
+}
